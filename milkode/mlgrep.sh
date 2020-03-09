@@ -1,5 +1,6 @@
 #!/bin/bash
 export RBENV_VERSION=2.6.5
+export THOR_SILENCE_DEPRECATION=true
 
 if [[ "$1" == "-a" ]];then
 

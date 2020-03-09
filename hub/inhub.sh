@@ -17,7 +17,20 @@ function open_in_github() {
     PROTOCOL="https://"
     REPONAME=$(git rev-parse --show-toplevel | rev | cut -d / -f1,2 | rev)
     PREFIX=$(git rev-parse --show-prefix)
-    BRANCH=$(git symbolic-ref --short HEAD)
+
+    REPO_URL=$(git remote get-url origin)
+    if [ $? -ne 0 ]; then
+        usage_exit
+    fi
+
+    CURRENT_BRANCH=$(git symbolic-ref HEAD)
+    # Check if branch exists on remote or not.
+    if [ -z "$(git ls-remote ${REPO_URL} ${CURRENT_BRANCH} 2> /dev/null)" ]; then
+        # Use master branch instead.
+        BRANCH="master"
+    else
+        BRANCH=$(git symbolic-ref --short HEAD)
+    fi
 
     if [ -d ${TARGET} ]; then
         github_url="${PROTOCOL}${GITHUB_HOST}/${REPONAME}/tree/${BRANCH}/${PREFIX}${TARGET}"
@@ -31,7 +44,7 @@ function open_in_github() {
     if [ ${SHOW_URL_ONLY} -eq 1 ]; then
         echo "${github_url}"
     else
-        echo "Opening ${REPONAME}:${PREFIX}${TARGET} in github" >&2
+        echo "Opening ${github_url} in github" >&2
         open ${github_url}
     fi
 }
@@ -42,7 +55,7 @@ function usage_exit() {
     echo "-s : only show url to stdout" >&2
     exit 1
 }
-
+SHOW_URL_ONLY=0
 while getopts sh OPT
 do
     case $OPT in
