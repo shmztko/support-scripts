@@ -1,5 +1,7 @@
 #!/bin/bash
 export RBENV_VERSION=2.6.5
+export THOR_SILENCE_DEPRECATION=true
+
 for repo in `ghq list`;
 do
   add_result=`milk add "$(ghq root)/${repo}"`
